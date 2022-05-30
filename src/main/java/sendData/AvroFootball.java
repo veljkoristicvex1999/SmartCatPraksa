@@ -5,7 +5,10 @@ import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.kafka.clients.producer.*;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.io.BufferedReader;
@@ -24,23 +27,21 @@ public class AvroFootball {
         String schemaString = parseAvro();
         Schema.Parser parser = new Schema.Parser();
         Schema schema = parser.parse(schemaString);
-        GenericRecord avroRecord = new GenericData.Record(schema);
         Properties properties = getProperties();
+        GenericRecord avroRecord = new GenericData.Record(schema);
         FootballData sendFootbalData = storeData(url);
         KafkaProducer<String, Object> producer = new KafkaProducer<>(properties);
         String topic = "firstProjectTopic";
-        avroRecord.put("FootbalData", sendFootbalData);
-        ProducerRecord<String, Object> record = new ProducerRecord<>(topic, "key1", avroRecord);
-        producer.send(record, new Callback() {
-            @Override
-            public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-                if (e == null) {
-                    System.out.println("Succes");
-                } else {
-                    System.out.println("It's not success");
-                }
-            }
-        });
+        avroRecord.put("count", sendFootbalData.getCount());
+        avroRecord.put("filters", sendFootbalData.getFilters());
+        avroRecord.put("areas", sendFootbalData.getAreas());
+        ProducerRecord<String, Object> record = new ProducerRecord<>(topic, "FootbalData", avroRecord);
+
+        try {
+            producer.send(record);
+        } catch (SerializationException e) {
+            // may need to do something with it
+        }
         System.out.println("sjajno");
         producer.flush();
         producer.close();
