@@ -1,0 +1,53 @@
+{
+  "type": "record",
+  "name": "FootbalData",
+  "namespace": "sendData",
+  "fields": [
+    {
+      "name": "count",
+      "type": "int"
+    },
+    {
+      "name": "filters",
+      "type": "null"
+    },
+    {
+      "name": "areas",
+      "type": {
+        "type": "array",
+        "items": [
+          {
+            "name": "Country",
+            "type": "record",
+            "fields": [
+              {
+                "name": "id",
+                "type": "int"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "countryCode",
+                "type": "string"
+              },
+              {
+                "name": "flag",
+                "type": "null"
+              },
+              {
+                "name": "parentAreaId",
+                "type": "int"
+              },
+              {
+                "name": "parentArea",
+                "type": "string"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
